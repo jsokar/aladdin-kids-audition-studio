@@ -185,6 +185,11 @@ html[data-theme="dark"] .guide-button{background:#243447;border-color:#496071;co
 .guide-dialog::backdrop{background:#07121cc7}.guide-dialog h2{font:400 30px 'DM Serif Display',serif;margin:0}.guide-dialog h3{font:400 21px 'DM Serif Display',serif;margin:24px 0 8px}.guide-dialog p,.guide-dialog li{line-height:1.5;font-size:14px}.guide-dialog ol{padding-left:22px}.guide-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.guide-close{background:transparent;border:1px solid #c5d5d3;border-radius:8px;color:inherit;padding:8px 12px}.guide-table{width:100%;border-collapse:collapse;font-size:13px}.guide-table th,.guide-table td{padding:10px 8px;border-bottom:1px solid #dfe7e4;text-align:left;vertical-align:top;line-height:1.4}.guide-table th:first-child{width:18%}.guide-small{font-size:12px!important;opacity:.75}.guide-dialog a{color:#317992}
 html[data-theme="dark"] .guide-dialog{background:#1c2b3a;border-color:#405568;color:#e7edf1}html[data-theme="dark"] .guide-table th,html[data-theme="dark"] .guide-table td{border-color:#405568}html[data-theme="dark"] .guide-dialog a{color:#92d4e3}
 @media(max-width:600px){.guide-dialog{padding:18px}.guide-table{display:block;overflow-x:auto}.guide-table th,.guide-table td{min-width:110px}}
+
+.progress-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;font-size:12px;color:var(--muted)}
+.progress-tools button,.queue-retry{border:1px solid #a7c0ba;background:transparent;color:var(--ink);border-radius:8px;padding:6px 9px;font-weight:700}
+.queue-state{font-size:12px;line-height:1.4;min-height:20px;color:var(--muted);margin:4px 0}.queue-state.error{color:#bd554b}html[data-theme="dark"] .queue-state.error{color:#ffada4}
+html[data-theme="dark"] .progress-tools button,html[data-theme="dark"] .queue-retry{border-color:#496071;color:#eef3f5}
 </style>
 </head>
 <body>
@@ -202,7 +207,7 @@ html[data-theme="dark"] .guide-dialog{background:#1c2b3a;border-color:#405568;co
 </dialog>
 <dialog class="guide-dialog" id="guideDialog" aria-labelledby="guideTitle">
 <div class="guide-head"><h2 id="guideTitle">Teacher’s guide</h2><button type="button" class="guide-close" id="guideClose" aria-label="Close guide">Close</button></div>
-<h3>How to evaluate</h3><ol><li>Enter your name. Use the same name each time to return to your saved evaluations.</li><li>Choose a student by number and watch the video.</li><li>Move all three sliders from 0 to 10: Acting, Singing, and Expression (clarity and personality).</li><li>Optionally choose a suggested role, then select <strong>Save evaluation</strong>. The next student opens automatically after a successful save.</li><li>Use Back or the number menu to review or update a saved evaluation. Choose Change beside your name to switch teachers.</li></ol>
+<h3>How to evaluate</h3><ol><li>Enter your name. Use the same name each time to return to your saved evaluations.</li><li>Choose a student by number and watch the video.</li><li>Move all three sliders from 0 to 10: Acting, Singing, and Expression (clarity and personality).</li><li>Optionally choose a suggested role, then select <strong>Save evaluation</strong>. The next student opens immediately while your evaluation saves. Keep this page open until all saves finish; use Retry saving if needed.</li><li>Use Find unevaluated to find missed students, or use Back and the number menu to review your work. Choose Change beside your name to switch teachers.</li></ol>
 <h3>Role guide</h3><p class="guide-small">Use these as flexible casting notes, not score cutoffs. Singing needs can change with the director’s staging and assigned solos.</p>
 <table class="guide-table"><thead><tr><th scope="col">Role</th><th scope="col">Acting</th><th scope="col">Singing</th><th scope="col">Expression</th></tr></thead><tbody>
 <tr><th scope="row">Aladdin</th><td>Strong, versatile lead</td><td>Strong; substantial singing</td><td>Warm, charismatic and sincere</td></tr>
@@ -253,6 +258,7 @@ html[data-theme="dark"] .guide-dialog{background:#1c2b3a;border-color:#405568;co
 <span class="counter" id="counter">
 </span>
 </div>
+<div class="progress-tools"><span id="progressText" role="status">Loading progress…</span><button type="button" id="nextUnevaluated" disabled>Find unevaluated</button></div>
 <div class="navigation student-nav">
 <button class="btn" id="back" disabled>← &nbsp; Back</button>
 <select class="student-picker" id="studentPicker" aria-label="Jump to student" disabled><option value="">Jump to student</option></select>
@@ -291,6 +297,7 @@ html[data-theme="dark"] .guide-dialog{background:#1c2b3a;border-color:#405568;co
 </div>
 <button class="btn primary save" id="save" disabled>Save evaluation</button></div>
 
+<div class="queue-state" id="queueState" role="status"></div><button type="button" class="queue-retry" id="retryQueue" hidden>Retry saving</button>
 <div class="status" role="status" id="status">
 </div>
 <p class="footer-note">
@@ -315,6 +322,28 @@ const google={script:{run:{withSuccessHandler(success){return {withFailureHandle
 const categories=[['acting','Acting'],['singing','Singing'],['clarity','Expression']];
 let videos=[],index=0,records={},dirty=false,busy=false,loadedTeacher='';
 const $=id=>document.getElementById(id);
+const QUEUE_KEY='auditionStudioSaveQueueV1';
+let saveQueue=[],queueRunning=false,queueFailed=false,queueStorageAvailable=true,confirmedDuringSession={};
+try{const stored=JSON.parse(localStorage.getItem(QUEUE_KEY)||'[]');if(Array.isArray(stored))saveQueue=stored.filter(x=>x&&x.data&&x.data.teacher&&x.data.videoId)}catch(e){queueStorageAvailable=false}
+function persistQueue(){try{localStorage.setItem(QUEUE_KEY,JSON.stringify(saveQueue));queueStorageAvailable=true}catch(e){queueStorageAvailable=false}}
+function teacherKey(name){return String(name||'').trim().toLowerCase()}
+function ownPending(){return saveQueue.filter(x=>teacherKey(x.data.teacher)===teacherKey(loadedTeacher))}
+function updateProgress(){
+ const pending=ownPending(), pendingIds=new Set(pending.map(x=>x.data.videoId));
+ let saved=0;videos.forEach(v=>{if(records[v.id]&&!pendingIds.has(v.id))saved++});
+ const missing=videos.length-saved-pendingIds.size;
+ $('progressText').textContent=loadedTeacher&&videos.length?`${saved} saved · ${pendingIds.size} saving · ${Math.max(0,missing)} unevaluated`:'Loading progress…';
+ $('nextUnevaluated').disabled=!loadedTeacher||!videos.length||missing<=0||busy;
+ const picker=$('studentPicker');videos.forEach((v,i)=>{if(picker.options[i])picker.options[i].textContent=v.name+(pendingIds.has(v.id)?' · saving':records[v.id]?' · saved':' · not evaluated')});
+ const node=$('queueState');node.classList.toggle('error',queueFailed||(!queueStorageAvailable&&saveQueue.length>0));
+ node.textContent=queueFailed?`Could not save ${saveQueue.length} pending evaluation${saveQueue.length===1?'':'s'}. Your work is kept here; retry when connected.`:saveQueue.length?`Saving ${saveQueue.length} evaluation${saveQueue.length===1?'':'s'} in the background${queueStorageAvailable?'':' — keep this page open'}.`:'';
+ $('retryQueue').hidden=!queueFailed;
+}
+function overlayPending(){ownPending().forEach(({data})=>{records[data.videoId]={acting:data.acting,singing:data.singing,clarity:data.clarity,role:data.role}})}
+function processQueue(){if(queueRunning||queueFailed||!saveQueue.length)return;queueRunning=true;updateProgress();const item=saveQueue[0];
+ callApi('save',item.data,()=>{queueRunning=false;const d=item.data;confirmedDuringSession[teacherKey(d.teacher)+'|'+d.videoId]={acting:d.acting,singing:d.singing,clarity:d.clarity,role:d.role};saveQueue.shift();persistQueue();updateProgress();processQueue()},()=>{queueRunning=false;queueFailed=true;updateProgress()})}
+$('retryQueue').addEventListener('click',()=>{queueFailed=false;updateProgress();processQueue()});
+$('nextUnevaluated').addEventListener('click',()=>{const pendingIds=new Set(ownPending().map(x=>x.data.videoId));for(let step=1;step<=videos.length;step++){const target=(index+step)%videos.length;if(!records[videos[target].id]&&!pendingIds.has(videos[target].id)){goToStudent(target);break}}});
 $('guideOpen').addEventListener('click',()=>$('guideDialog').showModal());
 $('guideClose').addEventListener('click',()=>$('guideDialog').close());
 const status=(s,e=false)=>{$('status').textContent=s;
@@ -352,7 +381,8 @@ $(id+'Value').textContent=val==null?'—':val});
 const roleSelect=$('role');const oldOption=roleSelect.querySelector('[data-legacy]');if(oldOption)oldOption.remove();
 const savedRole=r&&r.role||'No suggestion';if(!Array.from(roleSelect.options).some(o=>o.value===savedRole)){const legacy=document.createElement('option');legacy.value=savedRole;legacy.textContent=savedRole+' (previous suggestion)';legacy.dataset.legacy='yes';legacy.disabled=true;roleSelect.appendChild(legacy)}roleSelect.value=savedRole;
 dirty=false;
-status(r?'Saved evaluation loaded.':'');
+status(r?(ownPending().some(x=>x.data.videoId===v.id)?'Evaluation is waiting to save.':'Saved evaluation loaded.'):'');
+updateProgress();
 }
 function goToStudent(target){if(target===index)return;
 if(dirty&&!confirm('You have unsaved changes. Leave this student without saving?')){$('studentPicker').value=String(index);return;}
@@ -362,7 +392,7 @@ function move(delta){goToStudent(index+delta)}
 $('studentPicker').addEventListener('change',()=>goToStudent(Number($('studentPicker').value)));
 $('back').onclick=()=>move(-1);
 $('next').onclick=()=>move(1);
-window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();
+window.addEventListener('beforeunload',e=>{if(dirty||saveQueue.length){e.preventDefault();
 e.returnValue=''}});
 
 function setTheme(theme){document.documentElement.dataset.theme=theme;
@@ -389,6 +419,9 @@ return}status('Loading your evaluations…');
 google.script.run.withSuccessHandler(data=>{if($('teacher').value.trim()!==name)return;
 records=data;
 loadedTeacher=name;
+for(const v of videos){const cached=confirmedDuringSession[teacherKey(name)+'|'+v.id];if(cached)records[v.id]=cached}
+overlayPending();
+processQueue();
 try{localStorage.setItem('auditionStudioTeacher',name)}catch(e){}
 busy=false;
 render();
@@ -407,21 +440,12 @@ $('save').onclick=()=>{const name=$('teacher').value.trim();
 if(!name||name!==loadedTeacher){status('Enter your name to continue.',true);
 return}if(categories.some(([id])=>!$(id).dataset.touched)){status('Please move all three sliders to choose each score.',true);
 return}const v=videos[index],data={teacher:name,videoId:v.id,acting:+$('acting').value,singing:+$('singing').value,clarity:+$('clarity').value,role:$('role').value};
-busy=true;
-$('save').disabled=true;
-$('back').disabled=true;
-$('next').disabled=true;
-$('studentPicker').disabled=true;
-status('Saving…');
-google.script.run.withSuccessHandler(()=>{records[v.id]={acting:data.acting,singing:data.singing,clarity:data.clarity,role:data.role};
+// Capture an immutable snapshot before navigating. The queue is persisted first.
+const item={id:crypto.randomUUID(),data:{...data}};
+saveQueue.push(item);persistQueue();records[v.id]={acting:data.acting,singing:data.singing,clarity:data.clarity,role:data.role};
 dirty=false;
-busy=false;
-if(index<videos.length-1){index++;render();status('Saved. Ready for the next student ✓')}else{render();status('Saved. You’ve reached the last student ✓')}}).withFailureHandler(e=>{busy=false;
-$('save').disabled=false;
-$('back').disabled=index===0;
-$('next').disabled=index===videos.length-1;
-$('studentPicker').disabled=false;
-status('Could not save: '+e.message,true)}).saveEvaluation(data)};
+if(index<videos.length-1){index++;render();status('Moving to the next student.')}else{render();status('You’ve reached the last student.')}
+updateProgress();processQueue()};
 
 let remembered='';try{remembered=localStorage.getItem('auditionStudioTeacher')||''}catch(e){}
 $('teacher').value=remembered;
