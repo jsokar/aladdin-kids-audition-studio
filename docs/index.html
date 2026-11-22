@@ -178,6 +178,13 @@ html[data-theme="dark"] .teacher-dialog input:focus{border-color:#76bfce;box-sha
 html[data-theme="dark"] .scorecard::before{opacity:.45}
 html[data-theme="dark"] .stage{background:transparent;box-shadow:none;border:0}
 @media(max-width:760px){.layout{grid-template-columns:1fr}.tv{width:min(100%,600px)}.score{grid-template-columns:130px 1fr}.score-actions{flex-wrap:wrap}.save{flex:1;margin-bottom:0}.stage{padding:0}.student-picker{min-width:80px}}
+
+.guide-button{border:1px solid #ceded9;background:#ffffffb8;color:var(--ink);border-radius:10px;padding:9px 12px;font-weight:700}
+html[data-theme="dark"] .guide-button{background:#243447;border-color:#496071;color:#eef3f5}
+.guide-dialog{width:min(760px,calc(100vw - 32px));max-height:85vh;overflow:auto;border:1px solid #ccdcd5;border-radius:20px;background:#fff;color:#263c3a;padding:28px;box-shadow:0 24px 80px #0d192280}
+.guide-dialog::backdrop{background:#07121cc7}.guide-dialog h2{font:400 30px 'DM Serif Display',serif;margin:0}.guide-dialog h3{font:400 21px 'DM Serif Display',serif;margin:24px 0 8px}.guide-dialog p,.guide-dialog li{line-height:1.5;font-size:14px}.guide-dialog ol{padding-left:22px}.guide-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.guide-close{background:transparent;border:1px solid #c5d5d3;border-radius:8px;color:inherit;padding:8px 12px}.guide-table{width:100%;border-collapse:collapse;font-size:13px}.guide-table th,.guide-table td{padding:10px 8px;border-bottom:1px solid #dfe7e4;text-align:left;vertical-align:top;line-height:1.4}.guide-table th:first-child{width:18%}.guide-small{font-size:12px!important;opacity:.75}.guide-dialog a{color:#317992}
+html[data-theme="dark"] .guide-dialog{background:#1c2b3a;border-color:#405568;color:#e7edf1}html[data-theme="dark"] .guide-table th,html[data-theme="dark"] .guide-table td{border-color:#405568}html[data-theme="dark"] .guide-dialog a{color:#92d4e3}
+@media(max-width:600px){.guide-dialog{padding:18px}.guide-table{display:block;overflow-x:auto}.guide-table th,.guide-table td{min-width:110px}}
 </style>
 </head>
 <body>
@@ -193,12 +200,33 @@ html[data-theme="dark"] .stage{background:transparent;box-shadow:none;border:0}
 <p class="teacher-note">Use the same name each time. On shared devices, check the name before continuing.</p>
 </form>
 </dialog>
-<div class="app">
+<dialog class="guide-dialog" id="guideDialog" aria-labelledby="guideTitle">
+<div class="guide-head"><h2 id="guideTitle">Teacher’s guide</h2><button type="button" class="guide-close" id="guideClose" aria-label="Close guide">Close</button></div>
+<h3>How to evaluate</h3><ol><li>Enter your name. Use the same name each time to return to your saved evaluations.</li><li>Choose a student by number and watch the video.</li><li>Move all three sliders from 0 to 10: Acting, Singing, and Expression (clarity and personality).</li><li>Optionally choose a suggested role, then select <strong>Save evaluation</strong>. The next student opens automatically after a successful save.</li><li>Use Back or the number menu to review or update a saved evaluation. Choose Change beside your name to switch teachers.</li></ol>
+<h3>Role guide</h3><p class="guide-small">Use these as flexible casting notes, not score cutoffs. Singing needs can change with the director’s staging and assigned solos.</p>
+<table class="guide-table"><thead><tr><th scope="col">Role</th><th scope="col">Acting</th><th scope="col">Singing</th><th scope="col">Expression</th></tr></thead><tbody>
+<tr><th scope="row">Aladdin</th><td>Strong, versatile lead</td><td>Strong; substantial singing</td><td>Warm, charismatic and sincere</td></tr>
+<tr><th scope="row">Jasmine</th><td>Strong, caring and determined</td><td>Strong lead singer</td><td>Confident and heartfelt</td></tr>
+<tr><th scope="row">Genie</th><td>Strong comic timing</td><td>Comfortable; not necessarily the strongest singer</td><td>Big, playful showmanship</td></tr>
+<tr><th scope="row">Jafar</th><td>Strong villain with comic timing</td><td>Can sing or speak rhythmically</td><td>Commanding, sly and clear</td></tr>
+<tr><th scope="row">Iago</th><td>Playful comic sidekick</td><td>Only a few lyrics</td><td>Clear, sarcastic and lively</td></tr>
+<tr><th scope="row">Lamp Vendor</th><td>Strong storyteller</td><td>Not a major singing role</td><td>Clear, engaging and quick speaking</td></tr>
+<tr><th scope="row">Sultan</th><td>Warm, believable parent</td><td>Depends on staging</td><td>Kind, clear and authoritative</td></tr>
+<tr><th scope="row">Bread Vendor</th><td>Brief, energetic character</td><td>Depends on staging</td><td>Clearly shows frustration</td></tr>
+<tr><th scope="row">Fruit Vendor</th><td>Brief, friendly character</td><td>Depends on staging</td><td>Warm, clear and welcoming</td></tr>
+<tr><th scope="row">Prince Abdullah</th><td>Comic, self-important suitor</td><td>Depends on staging</td><td>Confident, exaggerated charm</td></tr>
+<tr><th scope="row">Prince Hassim</th><td>Comic, self-important suitor</td><td>Depends on staging</td><td>Distinctive, exaggerated confidence</td></tr>
+<tr><th scope="row">Prince Malik</th><td>Comic, self-important suitor</td><td>Depends on staging</td><td>Distinctive, playful confidence</td></tr>
+<tr><th scope="row">Cave Guardian</th><td>Brief, imposing character or voice</td><td>Depends on staging</td><td>Clear, mysterious and commanding</td></tr>
+<tr><th scope="row">Avis</th><td>Physical storytelling</td><td>Depends on staging</td><td>Strong facial expression and movement; no spoken lines</td></tr>
+<tr><th scope="row">Guards</th><td>Ensemble teamwork and character</td><td>Some guards have solo singing; others vary</td><td>Bold, coordinated reactions</td></tr>
+</tbody></table><p class="guide-small">Adapted from <a href="https://www.mtishows.com/print/node/18796157" target="_blank" rel="noopener noreferrer">Music Theatre International’s Aladdin KIDS character descriptions</a>.</p>
+</dialog><div class="app">
 
 <main class="main">
 <div class="topbar">
 <span class="brand"><span class="brand-mark">A</span> ALADDIN KIDS &nbsp; / &nbsp; AUDITION STUDIO</span>
-<div class="top-actions"><button type="button" class="teacher-button" id="teacherDisplay">Enter your name</button><button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark mode">☾ &nbsp; Dark</button></div>
+<div class="top-actions"><button type="button" class="guide-button" id="guideOpen">How to use &amp; roles</button><button type="button" class="teacher-button" id="teacherDisplay">Enter your name</button><button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark mode">☾ &nbsp; Dark</button></div>
 </div>
 <div class="layout">
 <section class="stage">
@@ -258,12 +286,7 @@ html[data-theme="dark"] .stage{background:transparent;box-shadow:none;border:0}
 <option>Prince Malik</option>
 <option>Cave Guardian</option>
 <option>Avis</option>
-<option>Djinn</option>
-<option>Agrabahns</option>
 <option>Guards</option>
-<option>Beggars</option>
-<option>Skeletons</option>
-<option>Prince Ali's Entourage</option>
 </select>
 </div>
 <button class="btn primary save" id="save" disabled>Save evaluation</button></div>
@@ -292,6 +315,8 @@ const google={script:{run:{withSuccessHandler(success){return {withFailureHandle
 const categories=[['acting','Acting'],['singing','Singing'],['clarity','Expression']];
 let videos=[],index=0,records={},dirty=false,busy=false,loadedTeacher='';
 const $=id=>document.getElementById(id);
+$('guideOpen').addEventListener('click',()=>$('guideDialog').showModal());
+$('guideClose').addEventListener('click',()=>$('guideDialog').close());
 const status=(s,e=false)=>{$('status').textContent=s;
 $('status').classList.toggle('error',e)};
 
@@ -324,7 +349,8 @@ categories.forEach(([id])=>{let val=r&&r[id];
 $(id).value=val==null?5:val;
 $(id).dataset.touched=val==null?'':'yes';
 $(id+'Value').textContent=val==null?'—':val});
-$('role').value=r&&r.role||'No suggestion';
+const roleSelect=$('role');const oldOption=roleSelect.querySelector('[data-legacy]');if(oldOption)oldOption.remove();
+const savedRole=r&&r.role||'No suggestion';if(!Array.from(roleSelect.options).some(o=>o.value===savedRole)){const legacy=document.createElement('option');legacy.value=savedRole;legacy.textContent=savedRole+' (previous suggestion)';legacy.dataset.legacy='yes';legacy.disabled=true;roleSelect.appendChild(legacy)}roleSelect.value=savedRole;
 dirty=false;
 status(r?'Saved evaluation loaded.':'');
 }
