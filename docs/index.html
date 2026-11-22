@@ -1,2 +1,414 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aladdin KIDS | Audition Studio</title><style>html,body{margin:0;width:100%;height:100%;background:#f3f3ed}iframe{display:block;width:100%;height:100%;border:0}</style></head><body><iframe title="Aladdin KIDS audition dashboard" src="https://script.google.com/a/macros/wcpss.net/s/AKfycbzBbSjM9DNOGj23XUempDO2TtuU1jVneZxPMsJCGFpLbXluR0HfEHJ2-6EyjIqYqX7NIA/exec" allow="autoplay; fullscreen" allowfullscreen></iframe></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#263c3a;--muted:#768481;--paper:#f7f5ef;--gold:#c58e55;--line:#e8e9e2;--teal:#315c56}
+*{box-sizing:border-box}
+body{margin:0;background:#f3f3ed;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+.app{max-width:1500px;margin:auto;min-height:100vh}
+.sidebar{background:#e8ede5;padding:38px 25px;display:flex;flex-direction:column;gap:42px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:.03em}
+.brand-mark{width:37px;height:37px;display:grid;place-items:center;border-radius:50%;background:var(--teal);color:#f6e6c4;font-family:'DM Serif Display';font-size:22px}
+.side-label,.eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:#8c9b92}
+.side-nav{background:#d8e3d8;border-radius:12px;padding:14px;color:#315c56;font-weight:700;display:flex;align-items:center;gap:10px}
+.side-bottom{margin-top:auto;border-top:1px solid #cedbd0;padding-top:20px;color:#74897e;line-height:1.6;font-size:12px}
+.main{padding:33px 48px 48px;min-width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #e2e6dd;padding-bottom:22px}
+.topbar span{color:#7b8b83;font-size:12px}
+.teacher{display:flex;align-items:center;gap:10px;color:#687e73;font-size:12px}
+.teacher input{width:180px;border:1px solid #dce4dc;background:#fff;border-radius:9px;padding:10px 12px;color:var(--ink);outline:none}
+.teacher input:focus{border-color:#769c8b}
+.hero{display:flex;justify-content:space-between;align-items:end;margin:36px 0 26px;gap:20px}
+.hero h1{font:400 40px/1.05 'DM Serif Display',serif;margin:10px 0 8px;letter-spacing:-.02em}
+.hero p{margin:0;color:#81918a}
+.hero-note{font:italic 17px 'DM Serif Display';color:#a89d8c}
+.layout{display:grid;grid-template-columns:minmax(0,1.52fr) minmax(350px,.9fr);gap:24px;align-items:start}
+.stage,.scorecard{background:#fff;border:1px solid #e9ede7;border-radius:20px;box-shadow:0 12px 35px rgba(58,77,63,.045)}
+.stage{padding:26px}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.section-head h2,.scorecard h2{font:400 22px 'DM Serif Display';margin:0}
+.section-head small{color:#95a49a}
+.tv{position:relative;background:#455c52;border-radius:24px;padding:14px 14px 32px;box-shadow:inset 0 1px 0 #829289,0 15px 24px #263c3a20}
+.screen{position:relative;aspect-ratio:1/1;background:#1f2926;border-radius:13px;overflow:hidden}
+.screen iframe{width:160%;height:160%;border:0;position:absolute;top:0;left:0;transform:scale(.625);transform-origin:top left}
+.screen-placeholder{height:100%;display:grid;place-items:center;text-align:center;color:#d0ddd1;padding:30px}
+.tv-bottom{position:absolute;bottom:9px;left:0;right:0;text-align:center;color:#bac9bb;font-size:8px;letter-spacing:.35em}
+.video-info{display:flex;align-items:center;gap:14px;padding:22px 0 18px}
+.thumb{width:65px;height:54px;object-fit:cover;border-radius:9px;background:#e6ece6}
+.video-info h3{font:400 21px 'DM Serif Display';margin:3px 0}
+.video-info p{margin:0;color:#9aa8a0;font-size:11px}
+.counter{margin-left:auto;font-size:12px;color:#82958a}
+.navigation{display:flex;gap:10px;border-top:1px solid var(--line);padding-top:18px}
+.btn{border:1px solid #dce5dd;background:white;color:var(--ink);padding:12px 17px;border-radius:10px;font-weight:700}
+.btn:hover{background:#f2f6f1}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+.btn.primary:hover{background:#264c46}
+.navigation .next{margin-left:auto}
+.student-picker{min-width:0;flex:1;max-width:230px;border:1px solid #dce5dd;border-radius:10px;background:#fff;color:var(--ink);padding:9px 10px;font:inherit;cursor:pointer}.student-picker:focus{outline:2px solid #769c8b;outline-offset:2px}.student-picker:disabled{opacity:.4;cursor:not-allowed}
+.scorecard{padding:27px}
+.card-top{display:flex;align-items:start;justify-content:space-between;gap:15px}
+.card-top p{color:#9aa8a0;margin:7px 0 0;font-size:12px}
+.gear{width:38px;height:38px;border-radius:50%;background:#f5f6f1;border:1px solid #e7ebe5;font-size:19px;color:#58756b}
+.role-panel{margin-top:18px;padding:14px;background:#f6f8f4;border-radius:12px}
+.role-panel label{display:block;font-size:11px;font-weight:700;margin-bottom:8px}
+.role-panel select{width:100%;padding:10px;border:1px solid #dbe5dc;background:white;border-radius:8px;color:var(--ink)}
+.role-current{font-size:11px;color:#8b9d92;margin-top:14px}
+.sliders{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:28px 0 22px}
+.score{text-align:center;min-width:0}
+.score-name{font-weight:700;font-size:12px;min-height:34px}
+.score-value{font:400 28px 'DM Serif Display';color:#325b52;margin:5px 0}
+.score-value small{font:12px 'DM Sans';color:#a4b0a8}
+.slider-wrap{height:180px;display:flex;align-items:center;justify-content:center;gap:8px}
+.range{writing-mode:vertical-lr;direction:rtl;appearance:slider-vertical;accent-color:#638d79;height:160px;width:26px;cursor:pointer}
+.ticks{height:160px;display:flex;flex-direction:column;justify-content:space-between;color:#a5b3a9;font-size:10px}
+.score-hint{font-size:10px;color:#9ba9a0}
+.save{width:100%;padding:14px}
+.status{min-height:34px;text-align:center;color:#728f80;font-size:12px;padding-top:11px}
+.status.error{color:#a64942}
+.footer-note{margin:20px 0 0;color:#9aaba0;font-size:11px;line-height:1.5}
+.spark{color:#c69e70;margin-right:5px}
+@media(max-width:1100px){.app{grid-template-columns:1fr}
+.sidebar{padding:16px 25px;flex-direction:row;align-items:center;gap:22px}
+.side-label,.side-bottom{display:none}
+.side-nav{padding:10px}
+.main{padding:28px}
+.layout{grid-template-columns:1fr 350px}
+}
+@media(max-width:760px){.main{padding:22px 16px}
+.topbar{align-items:start;flex-direction:column}
+.hero h1{font-size:34px}
+.hero-note{display:none}
+.layout{grid-template-columns:1fr}
+.sidebar{justify-content:space-between}
+.stage,.scorecard{padding:20px}
+.teacher input{width:170px}
+}
+
+/* Compact desktop workspace; small screens remain naturally scrollable. */
+.main{padding:18px 32px 24px}
+.topbar{padding-bottom:14px;margin-bottom:18px}
+.brand-mark{width:32px;height:32px;font-size:19px}
+.layout{grid-template-columns:minmax(0,calc(100dvh - 186px)) minmax(360px,1fr);gap:20px}
+.stage{padding:16px;display:flex;flex-direction:column;align-items:center}
+.section-head{width:100%;margin-bottom:10px}
+.section-head h2{font-size:17px}
+.tv{width:min(100%,calc(100dvh - 220px));padding:10px 10px 24px;border-radius:19px}
+.tv-bottom{bottom:6px;font-size:7px}
+.scorecard{padding:18px 26px}
+.video-info{padding:0 0 12px;gap:12px}
+.thumb{width:54px;height:48px}
+.video-info h3{font-size:23px}
+.navigation{padding-top:12px}
+.student-nav{margin-bottom:18px}
+.btn{padding:10px 18px;font-size:14px}
+.card-top h2{font-size:23px}
+.card-top p{margin-top:4px;font-size:13px}
+.role-panel{margin-top:12px;padding:10px 12px}
+.role-panel label{margin-bottom:5px;font-size:12px}
+.role-panel select{padding:9px;font-size:14px}
+.sliders{margin:14px 0 10px}
+.score-name{min-height:28px;font-size:14px}
+.score-value{font-size:28px;margin:1px 0}
+.slider-wrap{height:clamp(105px,19vh,160px)}
+.range,.ticks{height:clamp(95px,17vh,145px)}
+.save{padding:11px}
+.status{min-height:25px;padding-top:6px}
+.footer-note{margin:6px 0 0;font-size:12px}
+@media(max-width:760px){.main{padding:16px}.topbar{gap:10px}.layout{grid-template-columns:1fr}.tv{width:100%}.stage,.scorecard{padding:16px}.slider-wrap{height:150px}.range,.ticks{height:130px}}
+
+@media(min-width:761px) and (max-height:760px){.main{padding-top:12px;padding-bottom:12px}.topbar{padding-bottom:10px;margin-bottom:12px}.scorecard{padding:13px 24px}.video-info{padding-bottom:7px}.student-nav{padding-top:7px;margin-bottom:10px}.role-panel{margin-top:8px;padding:8px 12px}.sliders{margin:8px 0 5px}.slider-wrap{height:90px}.range,.ticks{height:80px}.footer-note{display:none}.status{min-height:20px;padding-top:3px}}
+.teacher-button{border:1px solid #dce5dd;background:#fff;color:var(--ink);border-radius:10px;padding:9px 14px;font-weight:600;cursor:pointer}
+.teacher-dialog{width:min(420px,calc(100vw - 32px));border:1px solid #e2ebe2;border-radius:22px;padding:32px;box-shadow:0 24px 80px #182f2880;color:var(--ink);background:#fff}
+.teacher-dialog::backdrop{background:rgba(27,49,43,.6)}
+.teacher-dialog h1{font:400 32px/1.1 'DM Serif Display',serif;margin:12px 0}
+.teacher-dialog p{color:#71867b;line-height:1.5;margin:0 0 20px}
+.teacher-dialog label{display:block;font-weight:700;font-size:12px;margin:0 0 8px}
+.teacher-dialog input{width:100%;border:1px solid #cfddd2;border-radius:10px;padding:12px 14px;font:inherit;color:var(--ink);outline:none}
+.teacher-dialog input:focus{border-color:#638d79;box-shadow:0 0 0 3px #dcebe1}
+.teacher-dialog button{width:100%;margin-top:16px;padding:13px}
+.teacher-dialog .teacher-message{min-height:20px;margin:8px 0 0;font-size:12px;color:#a64942}
+.teacher-dialog .teacher-note{font-size:12px;margin:14px 0 0}
+
+/* A quiet coastal palette with a moonlit alternative. */
+body{background:radial-gradient(ellipse at 85% 0%,#e3eeeb 0,transparent 40%),linear-gradient(155deg,#f4f3eb,#e8f1ee);min-height:100vh}
+.top-actions{display:flex;align-items:center;gap:10px}
+.theme-toggle{border:1px solid #ceded9;background:#ffffffb8;color:#315c56;border-radius:10px;padding:9px 12px;font-weight:700}
+.theme-toggle:hover{background:#fff}
+.stage,.scorecard{background:rgba(255,255,255,.9)}
+.tv{background:linear-gradient(145deg,#3d655f,#263f41)}
+html[data-theme="dark"]{color-scheme:dark;--ink:#e7edf1;--muted:#a6b7bd;--line:#354453;--teal:#3e83a1}
+html[data-theme="dark"] body{background:radial-gradient(ellipse at 78% 0%,#253244 0,transparent 42%),radial-gradient(ellipse at 18% 100%,#183748 0,transparent 42%),#0d1524}
+html[data-theme="dark"] .topbar{border-color:#334353}
+html[data-theme="dark"] .topbar span,html[data-theme="dark"] .section-head small,html[data-theme="dark"] .counter,html[data-theme="dark"] .card-top p,html[data-theme="dark"] .footer-note,html[data-theme="dark"] .video-info p,html[data-theme="dark"] .score-hint,html[data-theme="dark"] .ticks{color:#a9bbc4}
+html[data-theme="dark"] .stage,html[data-theme="dark"] .scorecard{background:linear-gradient(145deg,#1c293a,#152534);border-color:#3a5060;box-shadow:0 16px 40px #02091350}
+html[data-theme="dark"] .tv{background:linear-gradient(145deg,#344858,#202f3f);box-shadow:inset 0 1px 0 #667784,0 15px 24px #0005}
+html[data-theme="dark"] .btn,html[data-theme="dark"] .student-picker,html[data-theme="dark"] .teacher-button,html[data-theme="dark"] .theme-toggle,html[data-theme="dark"] .role-panel select{background:#243447;border-color:#496071;color:#eef3f5}
+html[data-theme="dark"] .btn:hover,html[data-theme="dark"] .theme-toggle:hover{background:#30495b}
+html[data-theme="dark"] .btn.primary{background:#347c9b;border-color:#4b9ab4;color:#fff}
+html[data-theme="dark"] .role-panel{background:#203444}
+html[data-theme="dark"] .score-value{color:#b9e2eb}
+html[data-theme="dark"] .range{accent-color:#77bcd2}
+html[data-theme="dark"] .teacher-dialog{background:#1c2b3a;border-color:#405568;color:#e7edf1}
+html[data-theme="dark"] .teacher-dialog p{color:#b4c5cb}
+html[data-theme="dark"] .teacher-dialog input{background:#26394a;border-color:#526a79;color:#fff}
+html[data-theme="dark"] .teacher-dialog input:focus{border-color:#76bfce;box-shadow:0 0 0 3px #36708666}
+@media(max-width:760px){.topbar{flex-direction:row;align-items:center;flex-wrap:wrap}.top-actions{margin-left:auto}}
+
+/* Spacious square screen and compact, horizontal evaluation rows. */
+.layout{grid-template-columns:minmax(0,1fr) minmax(390px,1fr);align-items:stretch}
+.stage{padding:12px;background:transparent;border:0;box-shadow:none;justify-content:center}
+.section-head{display:none}.tv{width:min(100%,calc(100dvh - 120px));padding:9px;border-radius:19px}.tv-bottom{display:none}
+.scorecard{position:relative;overflow:hidden;display:flex;flex-direction:column}
+.scorecard::before{content:"";position:absolute;inset:22% 0 10%;pointer-events:none;opacity:.28;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 440'%3E%3Cg fill='none' stroke='%237aa9b0' stroke-width='1'%3E%3Cpath d='M-40 250 C70 210 110 300 210 245 S310 170 385 215 480 265 650 185 M-30 262 C70 220 120 313 215 258 S320 182 390 230 500 275 640 200 M-40 370 C70 310 125 400 230 350 S340 275 405 325 500 385 630 300 M-30 383 C80 325 135 415 240 363 S340 290 412 340 510 400 640 315'/%3E%3Cpath d='M300 213c-25-15-3-40 12-25 12 13-4 22-8 12 M470 325c-29-17-4-46 13-27 13 15-4 25-9 14 M420 85c-24-10-14-36 3-28 13 7 3 20-4 15'/%3E%3Cpath d='M78 105l3 8 8 3-8 3-3 8-3-8-8-3 8-3z M508 136l2 6 6 2-6 2-2 6-2-6-6-2 6-2z'/%3E%3C/g%3E%3C/svg%3E") center/cover no-repeat}
+.scorecard>*{position:relative}.sliders{display:flex;flex-direction:column;gap:clamp(9px,2vh,20px);margin:clamp(14px,3vh,26px) 0;flex:1;justify-content:center}
+.score{display:grid;grid-template-columns:160px 1fr;grid-template-rows:auto auto;text-align:left;align-items:center;column-gap:14px}
+.score-name{min-height:0;font-size:14px;grid-column:1;grid-row:1}.score-value{grid-column:1;grid-row:2;font-size:20px;margin:0}
+.slider-wrap{grid-column:2;grid-row:1 / span 2;height:auto;display:flex;flex-direction:column-reverse;gap:3px}
+.range{writing-mode:horizontal-tb;direction:ltr;appearance:auto;width:100%;height:20px;accent-color:#4b8e9b}
+.ticks{width:100%;height:auto;flex-direction:row-reverse;font-size:10px}.score-hint{display:none}
+.score-actions{display:flex;align-items:end;gap:12px}.role-panel{flex:1;margin:0;padding:8px 10px;min-width:0}.save{width:auto;min-width:155px;margin-bottom:8px}
+html[data-theme="dark"] .scorecard::before{opacity:.45}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.tv{width:min(100%,600px)}.score{grid-template-columns:130px 1fr}.score-actions{flex-wrap:wrap}.save{flex:1;margin-bottom:0}.stage{padding:0}.student-picker{min-width:80px}}
+</style>
+</head>
+<body>
+<dialog class="teacher-dialog" id="teacherDialog" aria-labelledby="teacherTitle">
+<form id="teacherForm">
+<div class="eyebrow">WELCOME TO THE AUDITION STUDIO</div>
+<h1 id="teacherTitle">Let’s get started.</h1>
+<p>Enter your name to see your saved evaluations and continue where you left off.</p>
+<label for="teacher">Teacher’s name</label>
+<input id="teacher" placeholder="Enter your name" maxlength="100" autocomplete="name" required>
+<button class="btn primary" type="submit" id="teacherContinue">Continue to auditions →</button>
+<div id="teacherMessage" class="teacher-message" role="status"></div>
+<p class="teacher-note">Use the same name each time. On shared devices, check the name before continuing.</p>
+</form>
+</dialog>
+<div class="app">
+
+<main class="main">
+<div class="topbar">
+<span class="brand"><span class="brand-mark">A</span> ALADDIN KIDS &nbsp; / &nbsp; AUDITION STUDIO</span>
+<div class="top-actions"><button type="button" class="teacher-button" id="teacherDisplay">Enter your name</button><button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark mode">☾ &nbsp; Dark</button></div>
+</div>
+<div class="layout">
+<section class="stage">
+<div class="section-head">
+<h2>Now showing</h2>
+<small id="stageCount">Loading auditions…</small>
+</div>
+<div class="tv">
+<div class="screen">
+<div class="screen-placeholder" id="placeholder">Finding the audition videos…</div>
+<iframe id="video" title="Audition video" allow="autoplay; encrypted-media; fullscreen" allowfullscreen hidden>
+</iframe>
+</div>
+<div class="tv-bottom">✦ &nbsp; AUDITION STUDIO &nbsp; ✦</div>
+</div>
+</section>
+<section class="scorecard">
+<div class="video-info">
+<img class="thumb" id="thumb" alt="Video thumbnail" hidden>
+<div>
+<p>AUDITION VIDEO</p>
+<h3 id="student">Finding students…</h3>
+</div>
+<span class="counter" id="counter">
+</span>
+</div>
+<div class="navigation student-nav">
+<button class="btn" id="back" disabled>← &nbsp; Back</button>
+<select class="student-picker" id="studentPicker" aria-label="Jump to student" disabled><option value="">Jump to student</option></select>
+<button class="btn next" id="next" disabled>Next student &nbsp; →</button>
+</div>
+
+<div class="card-top">
+<div>
+<div class="eyebrow">YOUR IMPRESSIONS</div>
+<h2 style="margin-top:8px">Give them a score</h2>
+<p>Move each slider from 0 to 10.</p>
+</div>
+
+</div>
+<div class="sliders" id="sliders"></div>
+<div class="score-actions"><div class="role-panel" id="rolePanel">
+<label for="role">Suggested role <span style="font-weight:400;color:#8a9b90">(optional)</span></label>
+<select id="role">
+<option>No suggestion</option>
+<option>Aladdin</option>
+<option>Jasmine</option>
+<option>Genie</option>
+<option>Jafar</option>
+<option>Iago</option>
+<option>Lamp Vendor</option>
+<option>Sultan</option>
+<option>Bread Vendor</option>
+<option>Fruit Vendor</option>
+<option>Prince Abdullah</option>
+<option>Prince Hassim</option>
+<option>Prince Malik</option>
+<option>Cave Guardian</option>
+<option>Avis</option>
+<option>Djinn</option>
+<option>Agrabahns</option>
+<option>Guards</option>
+<option>Beggars</option>
+<option>Skeletons</option>
+<option>Prince Ali's Entourage</option>
+</select>
+</div>
+<button class="btn primary save" id="save" disabled>Save evaluation</button></div>
+
+<div class="status" role="status" id="status">
+</div>
+<p class="footer-note">
+<span class="spark">✦</span> Your scores are saved to the results sheet. You can return and update them using the same name.</p>
+</section>
+</div>
+</main>
+</div>
+<script>
+const API_URL='https://script.google.com/a/macros/wcpss.net/s/AKfycbzBbSjM9DNOGj23XUempDO2TtuU1jVneZxPMsJCGFpLbXluR0HfEHJ2-6EyjIqYqX7NIA/exec';
+function callApi(action,payload,success,failure){
+ const token=crypto.randomUUID(), frame=document.createElement('iframe'), form=document.createElement('form');
+ frame.name='request-'+token; frame.hidden=true; form.hidden=true; form.method='POST'; form.action=API_URL; form.target=frame.name;
+ const input=document.createElement('input'); input.name='request'; input.value=JSON.stringify({action,payload,token}); form.appendChild(input);
+ const timer=setTimeout(()=>finish(new Error('The request timed out. Please try again.')),30000);
+ function finish(error,data){clearTimeout(timer);window.removeEventListener('message',receive);form.remove();frame.remove();error?failure(error):success(data)}
+ function receive(event){if(!/^https:\/\/[a-z0-9-]+\.googleusercontent\.com$/.test(event.origin)||!event.data||event.data.token!==token)return;finish(event.data.error?new Error(event.data.error):null,event.data.result)}
+ window.addEventListener('message',receive);document.body.append(frame,form);form.submit();
+}
+const google={script:{run:{withSuccessHandler(success){return {withFailureHandler(failure){return {getAuditions(){callApi('auditions',null,success,failure)},getEvaluations(name){callApi('evaluations',name,success,failure)},saveEvaluation(data){callApi('save',data,success,failure)}}}}}}}};
+
+const categories=[['acting','Acting'],['singing','Singing'],['clarity','Clarity & personality']];
+let videos=[],index=0,records={},dirty=false,busy=false,loadedTeacher='';
+const $=id=>document.getElementById(id);
+const status=(s,e=false)=>{$('status').textContent=s;
+$('status').classList.toggle('error',e)};
+
+$('sliders').innerHTML=categories.map(([id,label])=>`<div class="score"><div class="score-name">${label}</div><div class="score-value"><span id="${id}Value">—</span><small> / 10</small></div><div class="slider-wrap"><div class="ticks"><span>10</span><span>5</span><span>0</span></div><input class="range" type="range" min="0" max="10" step="1" value="5" id="${id}" aria-label="${label} score out of 10"></div><div class="score-hint">Move to score</div></div>`).join('');
+
+function changed(){dirty=true;
+status('Unsaved changes');
+}categories.forEach(([id])=>$(id).addEventListener('input',()=>{$(id+'Value').textContent=$(id).value;
+$(id).dataset.touched='yes';
+changed()}));
+$('role').addEventListener('change',changed);
+
+function render(){const v=videos[index];
+$('back').disabled=!v||index===0||busy;
+$('next').disabled=!v||index===videos.length-1||busy;
+$('studentPicker').disabled=!v||busy;
+$('studentPicker').value=v?String(index):'';
+$('save').disabled=!v||busy||!loadedTeacher;
+$('stageCount').textContent=videos.length?`${videos.length} performances`:'No videos found';
+$('counter').textContent=v?`${String(index+1).padStart(2,'0')} / ${String(videos.length).padStart(2,'0')}`:'';
+$('student').textContent=v?'Student '+v.name:'No auditions available';
+$('video').hidden=!v;
+$('placeholder').hidden=!!v;
+if(v){$('video').src='https://drive.google.com/file/d/'+encodeURIComponent(v.id)+'/preview';
+$('thumb').src='https:'+'/'+'/drive.google.com/thumbnail?id='+encodeURIComponent(v.id)+String.fromCharCode(38)+'sz=w160';
+$('thumb').hidden=false;
+}else{$('thumb').hidden=true;
+$('placeholder').textContent='No videos were found in the audition folder.'}const r=v&&records[v.id];
+categories.forEach(([id])=>{let val=r&&r[id];
+$(id).value=val==null?5:val;
+$(id).dataset.touched=val==null?'':'yes';
+$(id+'Value').textContent=val==null?'—':val});
+$('role').value=r&&r.role||'No suggestion';
+dirty=false;
+status(r?'Saved evaluation loaded.':'');
+}
+function goToStudent(target){if(target===index)return;
+if(dirty&&!confirm('You have unsaved changes. Leave this student without saving?')){$('studentPicker').value=String(index);return;}
+index=target;
+render()}
+function move(delta){goToStudent(index+delta)}
+$('studentPicker').addEventListener('change',()=>goToStudent(Number($('studentPicker').value)));
+$('back').onclick=()=>move(-1);
+$('next').onclick=()=>move(1);
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();
+e.returnValue=''}});
+
+function setTheme(theme){document.documentElement.dataset.theme=theme;
+$('themeToggle').textContent=theme==='dark'?'☀  Light':'☾  Dark';
+$('themeToggle').setAttribute('aria-label',theme==='dark'?'Switch to light mode':'Switch to dark mode');
+try{localStorage.setItem('auditionStudioTheme',theme)}catch(e){}}
+let savedTheme='light';try{savedTheme=localStorage.getItem('auditionStudioTheme')||'light'}catch(e){}
+setTheme(savedTheme==='dark'?'dark':'light');
+$('themeToggle').addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
+
+function loadTeacher(){const name=$('teacher').value.trim();
+if(!name){$('teacherMessage').textContent='Please enter your name.';return;}
+$('teacherMessage').textContent='Loading your evaluations…';
+$('teacherContinue').disabled=true;
+if(dirty&&!confirm('You have unsaved changes. Change teachers without saving?')){$('teacher').value=loadedTeacher;
+$('teacherContinue').disabled=false;$('teacherMessage').textContent='';return}loadedTeacher='';
+records={};
+busy=true;
+render();
+if(!name){try{localStorage.removeItem('auditionStudioTeacher')}catch(e){}
+busy=false;
+render();
+return}status('Loading your evaluations…');
+google.script.run.withSuccessHandler(data=>{if($('teacher').value.trim()!==name)return;
+records=data;
+loadedTeacher=name;
+try{localStorage.setItem('auditionStudioTeacher',name)}catch(e){}
+busy=false;
+render();
+$('teacherDisplay').textContent=name+' · Change';
+$('teacherContinue').disabled=false;$('teacherMessage').textContent='';
+if($('teacherDialog').open)$('teacherDialog').close()
+}).withFailureHandler(e=>{busy=false;
+render();
+$('teacherContinue').disabled=false;$('teacherMessage').textContent='Could not load your evaluations: '+e.message;
+status('Could not load evaluations: '+e.message,true)}).getEvaluations(name)}
+$('teacherForm').addEventListener('submit',e=>{e.preventDefault();loadTeacher()});
+$('teacherDisplay').addEventListener('click',()=>{$('teacher').value=loadedTeacher;$('teacherMessage').textContent='';$('teacherDialog').showModal()});
+$('teacherDialog').addEventListener('cancel',e=>{if(!loadedTeacher)e.preventDefault()});
+
+$('save').onclick=()=>{const name=$('teacher').value.trim();
+if(!name||name!==loadedTeacher){status('Enter your name to continue.',true);
+return}if(categories.some(([id])=>!$(id).dataset.touched)){status('Please move all three sliders to choose each score.',true);
+return}const v=videos[index],data={teacher:name,videoId:v.id,acting:+$('acting').value,singing:+$('singing').value,clarity:+$('clarity').value,role:$('role').value};
+busy=true;
+$('save').disabled=true;
+$('back').disabled=true;
+$('next').disabled=true;
+$('studentPicker').disabled=true;
+status('Saving…');
+google.script.run.withSuccessHandler(()=>{records[v.id]={acting:data.acting,singing:data.singing,clarity:data.clarity,role:data.role};
+dirty=false;
+busy=false;
+render();
+status('Saved to the results sheet ✓')}).withFailureHandler(e=>{busy=false;
+$('save').disabled=false;
+$('back').disabled=index===0;
+$('next').disabled=index===videos.length-1;
+$('studentPicker').disabled=false;
+status('Could not save: '+e.message,true)}).saveEvaluation(data)};
+
+let remembered='';try{remembered=localStorage.getItem('auditionStudioTeacher')||''}catch(e){}
+$('teacher').value=remembered;
+$('teacherDialog').showModal();
+if(remembered){loadTeacher()}else{$('teacher').focus()}
+google.script.run.withSuccessHandler(v=>{videos=v;
+const picker=$('studentPicker'); picker.replaceChildren();
+videos.forEach((video,i)=>{const option=document.createElement('option'); option.value=String(i); option.textContent='Student '+video.name; picker.appendChild(option)});
+if(!videos.length){const option=document.createElement('option');option.value='';option.textContent='No students';picker.appendChild(option)}
+render();
+}).withFailureHandler(e=>{$('placeholder').textContent='Unable to load videos. Check access to the Drive folder.';
+$('student').textContent='Unable to load auditions';
+$('stageCount').textContent='Connection error';
+status(e.message,true)}).getAuditions();
+
+</script></body></html>
