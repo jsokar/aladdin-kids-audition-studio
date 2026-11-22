@@ -63,3 +63,20 @@ function saveEvaluation(data) {
     return true;
   } finally { lock.releaseLock(); }
 }
+
+// Small transport endpoint for the standalone GitHub page. The page submits
+// requests as form posts and receives the result through a temporary iframe.
+function doPost(e) {
+  let request = {}, result = null, error = '';
+  try {
+    request = JSON.parse(e.parameter.request || '{}');
+    if (!/^[0-9a-f-]{36}$/i.test(request.token || '')) throw new Error('Invalid request.');
+    if (request.action === 'auditions') result = getAuditions();
+    else if (request.action === 'evaluations') result = getEvaluations(request.payload);
+    else if (request.action === 'save') result = saveEvaluation(request.payload || {});
+    else throw new Error('Unknown request.');
+  } catch (err) { error = String(err.message || err); }
+  const message = JSON.stringify({token:request.token || '', result:result, error:error}).replace(/</g, '\\u003c');
+  return HtmlService.createHtmlOutput('<!doctype html><script>window.top.postMessage(' + message + ',"https://jsokar.github.io");<\/script>')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
