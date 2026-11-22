@@ -125,16 +125,38 @@ button:disabled{opacity:.4;cursor:not-allowed}
 @media(max-width:760px){.main{padding:16px}.topbar{gap:10px}.layout{grid-template-columns:1fr}.tv{width:100%}.stage,.scorecard{padding:16px}.slider-wrap{height:150px}.range,.ticks{height:130px}}
 
 @media(min-width:761px) and (max-height:760px){.main{padding-top:12px;padding-bottom:12px}.topbar{padding-bottom:10px;margin-bottom:12px}.scorecard{padding:13px 24px}.video-info{padding-bottom:7px}.student-nav{padding-top:7px;margin-bottom:10px}.role-panel{margin-top:8px;padding:8px 12px}.sliders{margin:8px 0 5px}.slider-wrap{height:90px}.range,.ticks{height:80px}.footer-note{display:none}.status{min-height:20px;padding-top:3px}}
+.teacher-button{border:1px solid #dce5dd;background:#fff;color:var(--ink);border-radius:10px;padding:9px 14px;font-weight:600;cursor:pointer}
+.teacher-dialog{width:min(420px,calc(100vw - 32px));border:1px solid #e2ebe2;border-radius:22px;padding:32px;box-shadow:0 24px 80px #182f2880;color:var(--ink);background:#fff}
+.teacher-dialog::backdrop{background:rgba(27,49,43,.6)}
+.teacher-dialog h1{font:400 32px/1.1 'DM Serif Display',serif;margin:12px 0}
+.teacher-dialog p{color:#71867b;line-height:1.5;margin:0 0 20px}
+.teacher-dialog label{display:block;font-weight:700;font-size:12px;margin:0 0 8px}
+.teacher-dialog input{width:100%;border:1px solid #cfddd2;border-radius:10px;padding:12px 14px;font:inherit;color:var(--ink);outline:none}
+.teacher-dialog input:focus{border-color:#638d79;box-shadow:0 0 0 3px #dcebe1}
+.teacher-dialog button{width:100%;margin-top:16px;padding:13px}
+.teacher-dialog .teacher-message{min-height:20px;margin:8px 0 0;font-size:12px;color:#a64942}
+.teacher-dialog .teacher-note{font-size:12px;margin:14px 0 0}
 </style>
 </head>
 <body>
+<dialog class="teacher-dialog" id="teacherDialog" aria-labelledby="teacherTitle">
+<form id="teacherForm">
+<div class="eyebrow">WELCOME TO THE AUDITION STUDIO</div>
+<h1 id="teacherTitle">Let’s get started.</h1>
+<p>Enter your name to see your saved evaluations and continue where you left off.</p>
+<label for="teacher">Teacher’s name</label>
+<input id="teacher" placeholder="Enter your name" maxlength="100" autocomplete="name" required>
+<button class="btn primary" type="submit" id="teacherContinue">Continue to auditions →</button>
+<div id="teacherMessage" class="teacher-message" role="status"></div>
+<p class="teacher-note">Use the same name each time. On shared devices, check the name before continuing.</p>
+</form>
+</dialog>
 <div class="app">
 
 <main class="main">
 <div class="topbar">
 <span class="brand"><span class="brand-mark">A</span> ALADDIN KIDS &nbsp; / &nbsp; AUDITION STUDIO</span>
-<label class="teacher">YOUR NAME <input id="teacher" placeholder="Enter your name" maxlength="100" autocomplete="name">
-</label>
+<button type="button" class="teacher-button" id="teacherDisplay">Enter your name</button>
 </div>
 <div class="layout">
 <section class="stage">
@@ -267,24 +289,37 @@ e.returnValue=''}});
 
 let nameTimer;
 function loadTeacher(){const name=$('teacher').value.trim();
+if(!name){$('teacherMessage').textContent='Please enter your name.';return;}
+$('teacherMessage').textContent='Loading your evaluations…';
+$('teacherContinue').disabled=true;
 if(dirty&&!confirm('You have unsaved changes. Change teachers without saving?')){$('teacher').value=loadedTeacher;
-return}loadedTeacher='';
+$('teacherContinue').disabled=false;$('teacherMessage').textContent='';return}loadedTeacher='';
 records={};
 busy=true;
 render();
-if(!name){busy=false;
+if(!name){try{localStorage.removeItem('auditionStudioTeacher')}catch(e){}
+busy=false;
 render();
 return}status('Loading your evaluations…');
 google.script.run.withSuccessHandler(data=>{if($('teacher').value.trim()!==name)return;
 records=data;
 loadedTeacher=name;
+try{localStorage.setItem('auditionStudioTeacher',name)}catch(e){}
 busy=false;
-render()}).withFailureHandler(e=>{busy=false;
 render();
-status('Could not load evaluations: '+e.message,true)}).getEvaluations(name)}$('teacher').addEventListener('change',loadTeacher);
+$('teacherDisplay').textContent=name+' · Change';
+$('teacherContinue').disabled=false;$('teacherMessage').textContent='';
+if($('teacherDialog').open)$('teacherDialog').close()
+}).withFailureHandler(e=>{busy=false;
+render();
+$('teacherContinue').disabled=false;$('teacherMessage').textContent='Could not load your evaluations: '+e.message;
+status('Could not load evaluations: '+e.message,true)}).getEvaluations(name)}
+$('teacherForm').addEventListener('submit',e=>{e.preventDefault();loadTeacher()});
+$('teacherDisplay').addEventListener('click',()=>{$('teacher').value=loadedTeacher;$('teacherMessage').textContent='';$('teacherDialog').showModal()});
+$('teacherDialog').addEventListener('cancel',e=>{if(!loadedTeacher)e.preventDefault()});
 
 $('save').onclick=()=>{const name=$('teacher').value.trim();
-if(!name||name!==loadedTeacher){status('Enter your name and leave the name field first.',true);
+if(!name||name!==loadedTeacher){status('Enter your name to continue.',true);
 return}if(categories.some(([id])=>!$(id).dataset.touched)){status('Please move all three sliders to choose each score.',true);
 return}const v=videos[index],data={teacher:name,videoId:v.id,acting:+$('acting').value,singing:+$('singing').value,clarity:+$('clarity').value,role:$('role').value};
 busy=true;
@@ -304,11 +339,15 @@ $('next').disabled=index===videos.length-1;
 $('studentPicker').disabled=false;
 status('Could not save: '+e.message,true)}).saveEvaluation(data)};
 
+let remembered='';try{remembered=localStorage.getItem('auditionStudioTeacher')||''}catch(e){}
+$('teacher').value=remembered;
+$('teacherDialog').showModal();
 google.script.run.withSuccessHandler(v=>{videos=v;
 const picker=$('studentPicker'); picker.replaceChildren();
 videos.forEach((video,i)=>{const option=document.createElement('option'); option.value=String(i); option.textContent='Student '+video.name; picker.appendChild(option)});
 if(!videos.length){const option=document.createElement('option');option.value='';option.textContent='No students';picker.appendChild(option)}
-render()}).withFailureHandler(e=>{$('placeholder').textContent='Unable to load videos. Check access to the Drive folder.';
+render();
+}).withFailureHandler(e=>{$('placeholder').textContent='Unable to load videos. Check access to the Drive folder.';
 $('student').textContent='Unable to load auditions';
 $('stageCount').textContent='Connection error';
 status(e.message,true)}).getAuditions();
