@@ -334,7 +334,7 @@ function updateProgress(){
  const missing=videos.length-saved-pendingIds.size;
  $('progressText').textContent=loadedTeacher&&videos.length?`${saved} saved · ${pendingIds.size} saving · ${Math.max(0,missing)} unevaluated`:'Loading progress…';
  $('nextUnevaluated').disabled=!loadedTeacher||!videos.length||missing<=0||busy;
- const picker=$('studentPicker');videos.forEach((v,i)=>{if(picker.options[i])picker.options[i].textContent=v.name+(pendingIds.has(v.id)?' · saving':records[v.id]?' · saved':' · not evaluated')});
+ const picker=$('studentPicker');videos.forEach((v,i)=>{if(picker.options[i]){const state=pendingIds.has(v.id)?'saving':records[v.id]?'saved':'not evaluated';picker.options[i].textContent=v.name+(state==='saving'?' 🟡':state==='saved'?' 🟢':' 🔴');picker.options[i].setAttribute('aria-label',v.name+' — '+state)}});
  const node=$('queueState');node.classList.toggle('error',queueFailed||(!queueStorageAvailable&&saveQueue.length>0));
  node.textContent=queueFailed?`Could not save ${saveQueue.length} pending evaluation${saveQueue.length===1?'':'s'}. Your work is kept here; retry when connected.`:saveQueue.length?`Saving ${saveQueue.length} evaluation${saveQueue.length===1?'':'s'} in the background${queueStorageAvailable?'':' — keep this page open'}.`:'';
  $('retryQueue').hidden=!queueFailed;
