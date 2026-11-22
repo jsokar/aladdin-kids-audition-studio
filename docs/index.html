@@ -190,6 +190,14 @@ html[data-theme="dark"] .guide-dialog{background:#1c2b3a;border-color:#405568;co
 .progress-tools button,.queue-retry{border:1px solid #a7c0ba;background:transparent;color:var(--ink);border-radius:8px;padding:6px 9px;font-weight:700}
 .queue-state{font-size:12px;line-height:1.4;min-height:20px;color:var(--muted);margin:4px 0}.queue-state.error{color:#bd554b}html[data-theme="dark"] .queue-state.error{color:#ffada4}
 html[data-theme="dark"] .progress-tools button,html[data-theme="dark"] .queue-retry{border-color:#496071;color:#eef3f5}
+
+/* Student list: muted status tints in both themes. */
+.picker-wrap{position:relative;flex:1;min-width:0;max-width:230px}
+.picker-wrap .student-picker{width:100%;max-width:none;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.picker-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.picker-menu{position:absolute;top:calc(100% + 6px);left:0;width:max(100%, 280px);max-width:min(360px,80vw);max-height:min(48vh,400px);overflow:auto;padding:6px;background:#fff;border:1px solid #d8e3dc;border-radius:12px;box-shadow:0 12px 32px #142e2930;z-index:20}
+.picker-menu[hidden]{display:none}.picker-option{display:block;width:100%;border:0;border-radius:7px;text-align:left;padding:8px 10px;margin:2px 0;font-size:14px;color:#263c3a;background:#f8e9e8}.picker-option[data-state="saved"]{background:#e4f1e8}.picker-option[data-state="saving"]{background:#f6efdf}.picker-option:hover,.picker-option:focus-visible{outline:2px solid #6d9b90;outline-offset:-2px}.picker-option[aria-current="true"]{font-weight:700}
+html[data-theme="dark"] .picker-menu{background:#1c2b3a;border-color:#496071;box-shadow:0 12px 32px #0008}html[data-theme="dark"] .picker-option{color:#f1e5e4;background:#55383d}html[data-theme="dark"] .picker-option[data-state="saved"]{color:#e2f0e8;background:#294b43}html[data-theme="dark"] .picker-option[data-state="saving"]{color:#f4e9cf;background:#514936}
 </style>
 </head>
 <body>
@@ -261,7 +269,7 @@ html[data-theme="dark"] .progress-tools button,html[data-theme="dark"] .queue-re
 <div class="progress-tools"><span id="progressText" role="status">Loading progress…</span><button type="button" id="nextUnevaluated" disabled>Find unevaluated</button></div>
 <div class="navigation student-nav">
 <button class="btn" id="back" disabled>← &nbsp; Back</button>
-<select class="student-picker" id="studentPicker" aria-label="Jump to student" disabled><option value="">Jump to student</option></select>
+<div class="picker-wrap"><select id="studentPicker" aria-label="Jump to student" hidden disabled><option value="">Jump to student</option></select><button type="button" class="student-picker" id="pickerButton" aria-haspopup="true" aria-expanded="false" disabled><span class="picker-label">Jump to student</span><span aria-hidden="true">⌄</span></button><div class="picker-menu" id="pickerMenu" aria-label="Choose a student" hidden></div></div>
 <button class="btn next" id="next" disabled>Next student &nbsp; →</button>
 </div>
 
@@ -334,7 +342,7 @@ function updateProgress(){
  const missing=videos.length-saved-pendingIds.size;
  $('progressText').textContent=loadedTeacher&&videos.length?`${saved} saved · ${pendingIds.size} saving · ${Math.max(0,missing)} unevaluated`:'Loading progress…';
  $('nextUnevaluated').disabled=!loadedTeacher||!videos.length||missing<=0||busy;
- const picker=$('studentPicker');videos.forEach((v,i)=>{if(picker.options[i]){const state=pendingIds.has(v.id)?'saving':records[v.id]?'saved':'not evaluated';picker.options[i].textContent=v.name+(state==='saving'?' 🟡':state==='saved'?' 🟢':' 🔴');picker.options[i].setAttribute('aria-label',v.name+' — '+state)}});
+ const picker=$('studentPicker'), menu=$('pickerMenu');videos.forEach((v,i)=>{const state=pendingIds.has(v.id)?'saving':records[v.id]?'saved':'not evaluated';if(picker.options[i])picker.options[i].textContent=v.name;const option=menu.children[i];if(option){option.dataset.state=state;option.setAttribute('aria-label',v.name+' — '+state);option.setAttribute('aria-current',String(i===index))}});
  const node=$('queueState');node.classList.toggle('error',queueFailed||(!queueStorageAvailable&&saveQueue.length>0));
  node.textContent=queueFailed?`Could not save ${saveQueue.length} pending evaluation${saveQueue.length===1?'':'s'}. Your work is kept here; retry when connected.`:saveQueue.length?`Saving ${saveQueue.length} evaluation${saveQueue.length===1?'':'s'} in the background${queueStorageAvailable?'':' — keep this page open'}.`:'';
  $('retryQueue').hidden=!queueFailed;
@@ -362,6 +370,8 @@ function render(){const v=videos[index];
 $('back').disabled=!v||index===0||busy;
 $('next').disabled=!v||index===videos.length-1||busy;
 $('studentPicker').disabled=!v||busy;
+$('pickerButton').disabled=!v||busy;
+$('pickerButton').querySelector('.picker-label').textContent=v?v.name:'Jump to student';
 $('studentPicker').value=v?String(index):'';
 $('save').disabled=!v||busy||!loadedTeacher;
 $('stageCount').textContent=videos.length?`${videos.length} performances`:'No videos found';
@@ -390,6 +400,11 @@ index=target;
 render()}
 function move(delta){goToStudent(index+delta)}
 $('studentPicker').addEventListener('change',()=>goToStudent(Number($('studentPicker').value)));
+function closePicker(){ $('pickerMenu').hidden=true; $('pickerButton').setAttribute('aria-expanded','false') }
+$('pickerButton').addEventListener('click',()=>{const opening=$('pickerMenu').hidden;$('pickerMenu').hidden=!opening;$('pickerButton').setAttribute('aria-expanded',String(opening));if(opening){const current=$('pickerMenu').children[index];if(current)current.scrollIntoView({block:'nearest'})}});
+$('pickerMenu').addEventListener('click',e=>{const option=e.target.closest('button[data-index]');if(!option)return;goToStudent(Number(option.dataset.index));closePicker();$('pickerButton').focus()});
+document.addEventListener('click',e=>{if(!e.target.closest('.picker-wrap'))closePicker()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('pickerMenu').hidden){closePicker();$('pickerButton').focus()}});
 $('back').onclick=()=>move(-1);
 $('next').onclick=()=>move(1);
 window.addEventListener('beforeunload',e=>{if(dirty||saveQueue.length){e.preventDefault();
@@ -453,7 +468,7 @@ $('teacherDialog').showModal();
 if(remembered){loadTeacher()}else{$('teacher').focus()}
 google.script.run.withSuccessHandler(v=>{videos=v;
 const picker=$('studentPicker'); picker.replaceChildren();
-videos.forEach((video,i)=>{const option=document.createElement('option'); option.value=String(i); option.textContent=video.name; picker.appendChild(option)});
+videos.forEach((video,i)=>{const option=document.createElement('option'); option.value=String(i); option.textContent=video.name; picker.appendChild(option);const entry=document.createElement('button');entry.type='button';entry.className='picker-option';entry.dataset.index=String(i);entry.textContent=video.name;$('pickerMenu').appendChild(entry)});
 if(!videos.length){const option=document.createElement('option');option.value='';option.textContent='No students';picker.appendChild(option)}
 render();
 }).withFailureHandler(e=>{$('placeholder').textContent='Unable to load videos. Check access to the Drive folder.';
