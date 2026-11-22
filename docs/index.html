@@ -52,7 +52,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
 .btn.primary:hover{background:#264c46}
 .navigation .next{margin-left:auto}
-.student-picker{min-width:0;flex:1;max-width:230px;border:1px solid #dce5dd;border-radius:10px;background:#fff;color:var(--ink);padding:9px 10px;font:inherit;cursor:pointer}.student-picker:focus{outline:2px solid #769c8b;outline-offset:2px}.student-picker:disabled{opacity:.4;cursor:not-allowed}
+.student-picker{min-width:0;flex:1;max-width:230px;border:1px solid #dce5dd;border-radius:10px;background:#fff;color:var(--ink);padding:9px 10px;font:inherit;cursor:pointer}.student-picker{font-size:16px;font-weight:700}.student-picker:focus{outline:2px solid #769c8b;outline-offset:2px}.student-picker:disabled{opacity:.4;cursor:not-allowed}
 .scorecard{padding:27px}
 .card-top{display:flex;align-items:start;justify-content:space-between;gap:15px}
 .card-top p{color:#9aa8a0;margin:7px 0 0;font-size:12px}
@@ -167,7 +167,7 @@ html[data-theme="dark"] .teacher-dialog input:focus{border-color:#76bfce;box-sha
 .stage{padding:12px;background:transparent;border:0;box-shadow:none;justify-content:center}
 .section-head{display:none}.tv{width:min(100%,calc(100dvh - 120px));padding:9px;border-radius:19px}.tv-bottom{display:none}
 .scorecard{position:relative;overflow:hidden;display:flex;flex-direction:column}
-.scorecard::before{content:"";position:absolute;inset:22% 0 10%;pointer-events:none;opacity:.28;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 440'%3E%3Cg fill='none' stroke='%237aa9b0' stroke-width='1'%3E%3Cpath d='M-40 250 C70 210 110 300 210 245 S310 170 385 215 480 265 650 185 M-30 262 C70 220 120 313 215 258 S320 182 390 230 500 275 640 200 M-40 370 C70 310 125 400 230 350 S340 275 405 325 500 385 630 300 M-30 383 C80 325 135 415 240 363 S340 290 412 340 510 400 640 315'/%3E%3Cpath d='M300 213c-25-15-3-40 12-25 12 13-4 22-8 12 M470 325c-29-17-4-46 13-27 13 15-4 25-9 14 M420 85c-24-10-14-36 3-28 13 7 3 20-4 15'/%3E%3Cpath d='M78 105l3 8 8 3-8 3-3 8-3-8-8-3 8-3z M508 136l2 6 6 2-6 2-2 6-2-6-6-2 6-2z'/%3E%3C/g%3E%3C/svg%3E") center/cover no-repeat}
+.scorecard::before{content:"";position:absolute;inset:22% 0 10%;pointer-events:none;opacity:.28;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 440'%3E%3Cg fill='none' stroke='%237aa9b0' stroke-width='1.8'%3E%3Cpath d='M-40 250 C70 210 110 300 210 245 S310 170 385 215 480 265 650 185 M-30 262 C70 220 120 313 215 258 S320 182 390 230 500 275 640 200 M-40 370 C70 310 125 400 230 350 S340 275 405 325 500 385 630 300 M-30 383 C80 325 135 415 240 363 S340 290 412 340 510 400 640 315'/%3E%3Cpath d='M300 213c-25-15-3-40 12-25 12 13-4 22-8 12 M470 325c-29-17-4-46 13-27 13 15-4 25-9 14 M420 85c-24-10-14-36 3-28 13 7 3 20-4 15'/%3E%3Cpath d='M78 105l3 8 8 3-8 3-3 8-3-8-8-3 8-3z M508 136l2 6 6 2-6 2-2 6-2-6-6-2 6-2z'/%3E%3C/g%3E%3C/svg%3E") center/cover no-repeat}
 .scorecard>*{position:relative}.sliders{display:flex;flex-direction:column;gap:clamp(9px,2vh,20px);margin:clamp(14px,3vh,26px) 0;flex:1;justify-content:center}
 .score{display:grid;grid-template-columns:160px 1fr;grid-template-rows:auto auto;text-align:left;align-items:center;column-gap:14px}
 .score-name{min-height:0;font-size:14px;grid-column:1;grid-row:1}.score-value{grid-column:1;grid-row:2;font-size:20px;margin:0}
@@ -289,13 +289,13 @@ function callApi(action,payload,success,failure){
 }
 const google={script:{run:{withSuccessHandler(success){return {withFailureHandler(failure){return {getAuditions(){callApi('auditions',null,success,failure)},getEvaluations(name){callApi('evaluations',name,success,failure)},saveEvaluation(data){callApi('save',data,success,failure)}}}}}}}};
 
-const categories=[['acting','Acting'],['singing','Singing'],['clarity','Clarity & personality']];
+const categories=[['acting','Acting'],['singing','Singing'],['clarity','Expression']];
 let videos=[],index=0,records={},dirty=false,busy=false,loadedTeacher='';
 const $=id=>document.getElementById(id);
 const status=(s,e=false)=>{$('status').textContent=s;
 $('status').classList.toggle('error',e)};
 
-$('sliders').innerHTML=categories.map(([id,label])=>`<div class="score"><div class="score-name">${label}</div><div class="score-value"><span id="${id}Value">—</span><small> / 10</small></div><div class="slider-wrap"><div class="ticks"><span>10</span><span>5</span><span>0</span></div><input class="range" type="range" min="0" max="10" step="1" value="5" id="${id}" aria-label="${label} score out of 10"></div><div class="score-hint">Move to score</div></div>`).join('');
+$('sliders').innerHTML=categories.map(([id,label])=>`<div class="score"><div class="score-name">${label}</div><div class="score-value"><span id="${id}Value">—</span><small> / 10</small></div><div class="slider-wrap"><div class="ticks"><span>10</span><span>5</span><span>0</span></div><input class="range" type="range" min="0" max="10" step="1" value="5" id="${id}" aria-label="${id==='clarity'?'Clarity and personality':label} score out of 10"></div><div class="score-hint">Move to score</div></div>`).join('');
 
 function changed(){dirty=true;
 status('Unsaved changes');
@@ -343,7 +343,7 @@ function setTheme(theme){document.documentElement.dataset.theme=theme;
 $('themeToggle').textContent=theme==='dark'?'☀  Light':'☾  Dark';
 $('themeToggle').setAttribute('aria-label',theme==='dark'?'Switch to light mode':'Switch to dark mode');
 try{localStorage.setItem('auditionStudioTheme',theme)}catch(e){}}
-let savedTheme='light';try{savedTheme=localStorage.getItem('auditionStudioTheme')||'light'}catch(e){}
+let savedTheme='dark';try{savedTheme=localStorage.getItem('auditionStudioTheme')||'dark'}catch(e){}
 setTheme(savedTheme==='dark'?'dark':'light');
 $('themeToggle').addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
 
@@ -390,8 +390,7 @@ status('Saving…');
 google.script.run.withSuccessHandler(()=>{records[v.id]={acting:data.acting,singing:data.singing,clarity:data.clarity,role:data.role};
 dirty=false;
 busy=false;
-render();
-status('Saved to the results sheet ✓')}).withFailureHandler(e=>{busy=false;
+if(index<videos.length-1){index++;render();status('Saved. Ready for the next student ✓')}else{render();status('Saved. You’ve reached the last student ✓')}}).withFailureHandler(e=>{busy=false;
 $('save').disabled=false;
 $('back').disabled=index===0;
 $('next').disabled=index===videos.length-1;
@@ -404,7 +403,7 @@ $('teacherDialog').showModal();
 if(remembered){loadTeacher()}else{$('teacher').focus()}
 google.script.run.withSuccessHandler(v=>{videos=v;
 const picker=$('studentPicker'); picker.replaceChildren();
-videos.forEach((video,i)=>{const option=document.createElement('option'); option.value=String(i); option.textContent='Student '+video.name; picker.appendChild(option)});
+videos.forEach((video,i)=>{const option=document.createElement('option'); option.value=String(i); option.textContent=video.name; picker.appendChild(option)});
 if(!videos.length){const option=document.createElement('option');option.value='';option.textContent='No students';picker.appendChild(option)}
 render();
 }).withFailureHandler(e=>{$('placeholder').textContent='Unable to load videos. Check access to the Drive folder.';
